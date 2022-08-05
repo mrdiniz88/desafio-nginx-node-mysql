@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  app:
+    container_name: app
+    build: ./app
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+  
+  db:
+    image: mysql:5.7
+    container_name: db
+    restart: always
+    ports:
+      - 3306:3306
+    volumes: 
+      - ./mysql/dbdata:/var/lib/mysql
+    environment: 
+      - MYSQL_DATABASE=desafio
+      - MYSQL_ROOT_PASSWORD=root
+  
+  ngnix:
+    restart: always
+    container_name: nginx-server
+    build: ./nginx
+    ports:
+      - 8080:80
