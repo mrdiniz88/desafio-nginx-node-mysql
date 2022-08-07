@@ -1,29 +1,35 @@
 version: '3.7'
 
 services:
-  app:
-    container_name: app
-    build: ./app
-    ports:
-      - 3000:3000
-    depends_on:
-      - db
-  
-  db:
-    image: mysql:5.7
+  db: 
     container_name: db
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
-    ports:
-      - 3306:3306
-    volumes: 
-      - ./mysql/dbdata:/var/lib/mysql
-    environment: 
-      - MYSQL_DATABASE=desafio
-      - MYSQL_ROOT_PASSWORD=root
-  
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: desafio
+    networks:
+      - nginx-net
+
+  app:
+    depends_on: 
+      - db
+    restart: always
+    container_name: app
+    build: ./app/
+    networks:
+      - nginx-net
   ngnix:
     restart: always
-    container_name: nginx-server
-    build: ./nginx
+    container_name: nginx
+    build: ./nginx/
+    networks:
+      - nginx-net
     ports:
       - 8080:80
+
+networks:
+  nginx-net:
+    name: nginx-net
+    driver: bridge
